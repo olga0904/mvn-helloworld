@@ -15,7 +15,7 @@ pipeline {
         }
         stage('build') {
             steps {
-				bat '${M2_HOME}/bin/mvn --batch-mode -V -U -e clean verify -Dsurefire.useFile=false -Dmaven.test.failure.ignore'
+				bat '${MAVEN_HOME}/bin/mvn --batch-mode -V -U -e clean verify -Dsurefire.useFile=false -Dmaven.test.failure.ignore'
             }
         }
 		stage ('Analysis') {
