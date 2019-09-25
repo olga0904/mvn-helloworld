@@ -1,38 +1,16 @@
-pipeline {
-    agent any
-    tools {
-        maven 'Maven 3.6.2'
-        jdk 'Java8'
+node {
+    stage ('Checkout') {
+        git branch:'master', url: 'git@github.com:olga0904/mvn-helloworld.git'
     }
-    stages {
-		stage ('Initialize') {
-            steps {
-                bat '''
-                    echo "PATH = ${PATH}"
-                    set "M2_HOME = ${MAVEN_HOME}"
-                '''
-            }
-        }
-        stage('build') {
-            steps {
-				bat 'mvn --batch-mode -V -U -e clean verify -Dsurefire.useFile=false -Dmaven.test.failure.ignore'
-            }
-        }
-		stage ('Analysis') {
-            steps {
-                bat 'mvn --batch-mode -V -U -e checkstyle:checkstyle pmd:pmd pmd:cpd findbugs:findbugs spotbugs:spotbugs'
-            }
-        }	
-    }
-	post {
-        always {
-			junit testResults: '**/target/surefire-reports/TEST-*.xml'
+    stage ('Build') {
+        def M2_Home = tool 'maven 3.6.2'
 
-            recordIssues enabledForFailure: true, tools: [mavenConsole(), java(), javaDoc()]
-            recordIssues enabledForFailure: true, tool: checkStyle()
-            recordIssues enabledForFailure: true, tool: spotBugs()
-            recordIssues enabledForFailure: true, tool: cpd(pattern: '**/target/cpd.xml')
-            recordIssues enabledForFailure: true, tool: pmdParser(pattern: '**/target/pmd.xml')
-        }
+        bat "${M2_Home}/bin/mvn --batch-mode -V -U -e clean verify -Dsurefire.useFile=false"
+
+        junit testResults: '**/target/*-reports/TEST-*.xml'
+
+        def java = scanForIssues tool: java()
+        def javadoc = scanForIssues tool: javaDoc()
+        
+        publishIssues issues: [java, javadoc], filters: [includePackage('io.jenkins.plugins.analysis.*')]
     }
-}
