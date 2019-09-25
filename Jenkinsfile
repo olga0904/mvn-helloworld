@@ -18,20 +18,11 @@ pipeline {
 				bat '${M2_HOME}/bin/mvn --batch-mode -V -U -e clean verify -Dsurefire.useFile=false -Dmaven.test.failure.ignore'
             }
         }
-		stage('Test') { 
+		stage ('Analysis') {
             steps {
-                bat 'mvn test' 
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml' 
-                }
+                bat '${M2_HOME}/bin/mvn --batch-mode -V -U -e checkstyle:checkstyle pmd:pmd pmd:cpd findbugs:findbugs spotbugs:spotbugs'
             }
         }
-		stage('Static Code Analysis') { 
-            steps {
-				 
-            }
-        }
+		
     }
 }
