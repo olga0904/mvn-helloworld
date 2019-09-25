@@ -9,13 +9,13 @@ pipeline {
             steps {
                 bat '''
                     echo "PATH = ${PATH}"
-                    echo "M2_HOME = ${MAVEN_HOME}"
+                    set "M2_HOME = ${MAVEN_HOME}"
                 '''
             }
         }
         stage('build') {
             steps {
-				bat '${MAVEN_HOME}/bin/mvn --batch-mode -V -U -e clean verify -Dsurefire.useFile=false -Dmaven.test.failure.ignore'
+				bat '${M2_HOME}/bin/mvn --batch-mode -V -U -e clean verify -Dsurefire.useFile=false -Dmaven.test.failure.ignore'
             }
         }
 		stage ('Analysis') {
