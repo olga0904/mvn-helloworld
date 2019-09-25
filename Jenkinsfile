@@ -15,7 +15,7 @@ pipeline {
         }
         stage('build') {
             steps {
-				bat 'mvn -B -DskipTests clean package'
+				bat '${M2_HOME}/bin/mvn --batch-mode -V -U -e clean verify -Dsurefire.useFile=false -Dmaven.test.failure.ignore'
             }
         }
 		stage('Test') { 
@@ -28,9 +28,9 @@ pipeline {
                 }
             }
         }
-		stage('Deliver') { 
+		stage('Static Code Analysis') { 
             steps {
-				bat './jenkins/scripts/deliver.bat' 
+				 
             }
         }
     }
